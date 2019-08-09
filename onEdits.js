@@ -20,7 +20,8 @@ function onEdit(e) {
     //validates Email
     if (!emailRegex.test(value)) {
       range.setBorder(true, true, true, true, false, false, "red", null);
-      Logger.log("not an email");
+    } else {
+      range.setBorder(true, true, true, true, false, false, "black", null);
     }
   } else if (column === phoneColumn) {
     //validates and formats phone number
@@ -28,9 +29,22 @@ function onEdit(e) {
   }
 }
 
+function testFormatPhone() {
+  var range = pafSheet.getRange("G62");
+  var value = range.getDisplayValue();
+  formatPhone(value, range);
+}
+
 function formatPhone(value, range) {
   var matches = value.match(phoneRegex);
   var phoneString = matches.join("");
+  if (value.length < 10) {
+    range.setValue(value + " is less than 10 digits. Please re-enter.");
+    return;
+  }
+  if (value.indexOf("less") > -1) {
+    return;
+  }
   if (phoneString.length > 10) {
     var length = phoneString.length;
     var internationalFormat =
@@ -39,9 +53,7 @@ function formatPhone(value, range) {
       " " +
       phoneString.slice(length - 10);
     range.setValue(internationalFormat);
-  } else if (phoneString.length < 10) {
-    range.setValue(phoneString + " is less than 10 digits. Please re-enter."); // for some reason inserts "10" after the phone number?
-  } else {
-    range.setValue(phoneString);
+    return;
   }
+  range.setValue(phoneString);
 }
